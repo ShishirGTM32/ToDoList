@@ -3,10 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Django stuff:
-db.sqlite3  # Exclude SQLite database files (if using SQLite for local dev)
-*.sqlite3
-
 # Migrations (do not ignore if you want to track them)
 */migrations/*.pyc
 */migrations/*.py
