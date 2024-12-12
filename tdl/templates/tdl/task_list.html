@@ -1,0 +1,117 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoList</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <!-- Main Box (Centered) -->
+        <div class="box shadow-lg p-4 bg-white w-100" style="max-width: 900px;">
+            <!-- Authentication Section -->
+            {% if request.user.is_authenticated %}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="mb-0">Welcome, {{ request.user }}</p>
+                <form method="post" action="{% url 'LogOut' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger btn-sm" type="submit">LogOut</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="text-end mb-4">
+                <a class="btn btn-primary btn-sm" href="{% url 'LogIn' %}">LogIn</a>
+            </div>
+            {% endif %}
+
+            <h1 class="text-center text-primary mb-4">ToDoList</h1>
+
+            <!-- Add Task and Search -->
+            <div class="mb-4">
+                <a href="{% url 'CreateTask' %}" class="btn btn-success mb-3">Add Task</a>
+                <form class="d-flex" action="" method="get">
+                    <input class="form-control me-2" type="text" name="search-area" placeholder="Search tasks"
+                        value="{{ search_input }}">
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                </form>
+            </div>
+
+            <!-- Tasks Count -->
+            <p class="text-muted mb-4">Uncompleted tasks: {{ tasks.count }}</p>
+
+            <!-- Tasks Display (One Task per Row) -->
+            <div class="row">
+                {% for ta in tasks %}
+                <div class="col-12 mb-4">
+                    <div class="card border-primary">
+                        <div class="card-body bg-light">
+                            <!-- Task Title in Bold -->
+                            <h5 class="card-title text-primary font-weight-bold">{{ ta.title }}</h5>
+
+                            <!-- Task Description -->
+                            <p class="card-text">
+                                {% if ta.description %}
+                                    {{ ta.description }}
+                                {% else %}
+                                    No description available.
+                                {% endif %}
+                            </p>
+
+                            <!-- Buttons Below the Description -->
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'TaskUpdate' ta.id %}" class="btn btn-warning btn-sm">Update</a>
+                                <a href="{% url 'TaskDelete' ta.id %}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ ta.id }}">Delete</a>
+                                {% if ta.complete %}
+                                <form method="post" action="{% url 'ToggleComplete' ta.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-success btn-sm" type="submit">Mark as Incomplete</button>
+                                </form>
+                                {% else %}
+                                <form method="post" action="{% url 'ToggleComplete' ta.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-secondary btn-sm" type="submit">Mark as Complete</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal for Delete Confirmation -->
+                <div class="modal fade" id="deleteModal-{{ ta.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Delete Task</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete the task: <strong>"{{ ta.title }}"</strong>?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <form action="{% url 'TaskDelete' ta.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Delete" class="btn btn-danger">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

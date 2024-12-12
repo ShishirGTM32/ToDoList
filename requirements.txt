@@ -1,0 +1,7 @@
+asgiref==3.8.1
+Django==5.1.4
+djangorestframework==3.15.2
+environ==1.0
+sqlparse==0.5.3
+tzdata==2024.2
+whitenoise==6.8.2
